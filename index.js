@@ -102,8 +102,8 @@ let eachRegionResults = [];
     const paginationLinkSelectors = paginationSelector.querySelectorAll('a');
 
     console.log(CONSOLE_MAGENTA, '   -- Counting how many page result...');
-    // const indexxEnd = Number(paginationLinkSelectors[paginationLinkSelectors.length - 2].textContent);
-    const indexxEnd = 1;
+    const indexxEnd = Number(paginationLinkSelectors[paginationLinkSelectors.length - 2].textContent);
+    // const indexxEnd = 1;
 
     const startCollecting = performance.now();
     let propertyTotal = startPropertyTotal;
