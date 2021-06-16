@@ -137,11 +137,6 @@ let eachRegionResults = [];
             startKey = 0;
         }
 
-        // create checkpoint
-        if (indexx > 1 && indexx % 5 === 0) {
-            createCheckPoint(indexx, startKey).then();
-        }
-
         const wrappedResults = doc.querySelectorAll('.hotel-card');
         for (let key = startKey; key < wrappedResults.length; key++) {
             const startTime = performance.now();
@@ -284,6 +279,11 @@ let eachRegionResults = [];
                 console.log(CONSOLE_RED, `Got error`);
                 await delay(1800000);
             }
+        }
+
+        // create checkpoint
+        if (indexx > 1 && indexx % 5 === 0) {
+            createCheckPoint(indexx, startKey).then();
         }
 
         startIndexx = 1;
