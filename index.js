@@ -108,7 +108,11 @@ let eachRegionResults = [];
     const startCollecting = performance.now();
     let propertyTotal = startPropertyTotal;
 
+    let breaking = false;
+
     for (let indexx = startIndexx; indexx <= indexxEnd; indexx++) {
+        if (breaking) break;
+
         console.log(CONSOLE_GREEN, `   $$ Evaluate page ${indexx} of ${indexxEnd}.`);
 
         if (indexx > startIndexx) {
@@ -127,7 +131,10 @@ let eachRegionResults = [];
         const wrappedResults = doc.querySelectorAll('.hotel-card');
         for (let key = startKey; key < wrappedResults.length; key++) {
             const startTime = performance.now();
-            // if (propertyTotal === 100) break;
+            // if (propertyTotal === 11) {
+            //     breaking = true;
+            //     break;
+            // }
 
             try {
                 const value = wrappedResults[key];
@@ -266,15 +273,17 @@ let eachRegionResults = [];
                 // ========================================================================================
 
                 console.log(CONSOLE_RED, `Got error`);
+                await delay(1800000);
             }
         }
 
         startIndexx = 1;
     }
 
-    const collectedIn = (((performance.now() - startCollecting) / 1000) / 60) / 60;
-    const collectedTime = `in ${collectedIn.toFixed(2)} hours`;
-    console.log(CONSOLE_MAGENTA, `   -- Data was collected successfully ${collectedTime}`);
+    const minutes = ((performance.now() - startCollecting) / 60000);
+    const collectedIn = ( minutes / 60);
+    const collectedTime = `${collectedIn.toFixed(2)} hours (${minutes.toFixed(2)} minutes)`;
+    console.log(CONSOLE_MAGENTA, `   -- Data was collected successfully in ${chalk.greenBright(collectedTime)}`);
 
     console.log(CONSOLE_BLUE, `3. Writing data results into CSV file > ${region.jsonSelector}.csv`);
     const csvWriter = createCsvWriter({
@@ -300,17 +309,18 @@ let eachRegionResults = [];
         ]
     });
 
+    const startWriteCsv = performance.now();
     await csvWriter.writeRecords(eachRegionResults);
-    console.log(CONSOLE_GREEN, '   $$ The CSV file was written successfully!');
+    console.log(CONSOLE_MAGENTA, `   $$ The CSV file was written successfully. ${chalk.greenBright(`Complete in ${((performance.now() - startWriteCsv) / 1000).toFixed(4)}s`)}`);
 
     // try to remove log error file
     try { fs.unlinkSync(TEMP_RESULT_JSON); } catch (e) {}
     try { fs.unlinkSync(STOPPED_JSON); } catch (e) {}
     // =========================
 
-    console.log(CONSOLE_BLUE, '4. Closing chrome browser...');
+    console.log(CONSOLE_BLUE, '4. Closing chrome tab...');
     await page.close();
 
-    console.log(CONSOLE_RED, '-  Terminating application...');
-    setTimeout(() => process.exit(), 2000);
+    // console.log(CONSOLE_RED, '-  Terminating application...');
+    // setTimeout(() => process.exit(), 2000);
 })();
