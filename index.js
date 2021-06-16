@@ -108,6 +108,15 @@ let eachRegionResults = [];
     const startCollecting = performance.now();
     let propertyTotal = startPropertyTotal;
 
+
+    const createCheckPoint = async (indexx, key) => {
+        // creating log error, so can restart program from last evaluation
+        const stoppedOn = { page: indexx, dataIndex: key, propertyTotal };
+        await fs.writeFile(STOPPED_JSON, JSON.stringify(stoppedOn), err => {});
+        await fs.writeFile(TEMP_RESULT_JSON, JSON.stringify(eachRegionResults), err => {});
+        // ========================================================================================
+    }
+
     let breaking = false;
 
     for (let indexx = startIndexx; indexx <= indexxEnd; indexx++) {
@@ -128,6 +137,11 @@ let eachRegionResults = [];
             startKey = 0;
         }
 
+        // create checkpoint
+        if (indexx > 1 && indexx % 5 === 0) {
+            createCheckPoint(indexx, startKey).then();
+        }
+
         const wrappedResults = doc.querySelectorAll('.hotel-card');
         for (let key = startKey; key < wrappedResults.length; key++) {
             const startTime = performance.now();
@@ -135,7 +149,6 @@ let eachRegionResults = [];
             //     breaking = true;
             //     break;
             // }
-
             try {
                 const value = wrappedResults[key];
 
@@ -266,11 +279,7 @@ let eachRegionResults = [];
                 eachRegionResults.push(hotel);
                 propertyTotal++;
             } catch (e) {
-                // creating log error, so can restart program from last evaluation
-                const stoppedOn = { page: indexx, dataIndex: key, propertyTotal };
-                await fs.writeFile(STOPPED_JSON, JSON.stringify(stoppedOn), err => {});
-                await fs.writeFile(TEMP_RESULT_JSON, JSON.stringify(eachRegionResults), err => {});
-                // ========================================================================================
+                createCheckPoint(indexx, key).then();
 
                 console.log(CONSOLE_RED, `Got error`);
                 await delay(1800000);
