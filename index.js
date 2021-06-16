@@ -282,7 +282,7 @@ let eachRegionResults = [];
         }
 
         // create checkpoint
-        if (indexx > 1 && indexx % 5 === 0) {
+        if (indexx > 1 && indexx % 2 === 0) {
             createCheckPoint(indexx, startKey).then();
         }
 
